@@ -12,11 +12,13 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/ui/states';
 import { Palette, Spacing } from '@/constants/theme';
 import { useFetch } from '@/hooks/use-fetch';
 import { api, errorMessage, query } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import { endOfMonth, formatHours, formatMonth, startOfMonth, toIsoDate } from '@/lib/dates';
 import type { Guard, GuardHoursReport } from '@/types/api';
 
 export default function GuardDetailScreen() {
   const params = useLocalSearchParams<{ id: string; month?: string }>();
+  const { isAdmin } = useAuth();
   const [month, setMonth] = useState(() => {
     if (params.month) {
       const [year, monthNumber] = params.month.split('-').map(Number);
@@ -88,13 +90,15 @@ export default function GuardDetailScreen() {
             onPress={() => Linking.openURL(`tel:${current.phone}`)}
             style={styles.flex}
           />
-          <CustomButton
-            title="Editar"
-            icon="edit"
-            variant="secondary"
-            onPress={() => router.push({ pathname: '/guards/form', params: { id: String(current.id) } })}
-            style={styles.flex}
-          />
+          {isAdmin && (
+            <CustomButton
+              title="Editar"
+              icon="edit"
+              variant="secondary"
+              onPress={() => router.push({ pathname: '/guards/form', params: { id: String(current.id) } })}
+              style={styles.flex}
+            />
+          )}
         </View>
       </Card>
 
@@ -122,20 +126,26 @@ export default function GuardDetailScreen() {
                 shift={shift}
                 show="service"
                 showDate
-                onPress={() => router.push({ pathname: '/shifts/form', params: { id: String(shift.id) } })}
+                onPress={
+                  isAdmin
+                    ? () => router.push({ pathname: '/shifts/form', params: { id: String(shift.id) } })
+                    : undefined
+                }
               />
             ))
           )}
         </>
       )}
 
-      <CustomButton
-        title={current.active ? 'Desactivar guardia' : 'Activar guardia'}
-        icon={current.active ? 'person-off' : 'person-add'}
-        variant={current.active ? 'danger' : 'secondary'}
-        onPress={toggleActive}
-        style={styles.toggle}
-      />
+      {isAdmin && (
+        <CustomButton
+          title={current.active ? 'Desactivar guardia' : 'Activar guardia'}
+          icon={current.active ? 'person-off' : 'person-add'}
+          variant={current.active ? 'danger' : 'secondary'}
+          onPress={toggleActive}
+          style={styles.toggle}
+        />
+      )}
     </ScreenContainer>
   );
 }

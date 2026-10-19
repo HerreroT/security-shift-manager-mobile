@@ -12,11 +12,13 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/ui/states';
 import { Palette, Spacing } from '@/constants/theme';
 import { useFetch } from '@/hooks/use-fetch';
 import { api, errorMessage, query } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import { toIsoDate } from '@/lib/dates';
 import type { Service, ShiftAssignment } from '@/types/api';
 
 export default function ServiceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { isAdmin } = useAuth();
   const [day, setDay] = useState(() => new Date());
   const isoDay = toIsoDate(day);
 
@@ -81,12 +83,14 @@ export default function ServiceDetailScreen() {
             onPress={() => router.navigate({ pathname: '/who', params: { serviceId: String(current.id) } })}
             style={styles.flex}
           />
-          <CustomButton
-            title="Editar"
-            icon="edit"
-            variant="secondary"
-            onPress={() => router.push({ pathname: '/services/form', params: { id: String(current.id) } })}
-          />
+          {isAdmin && (
+            <CustomButton
+              title="Editar"
+              icon="edit"
+              variant="secondary"
+              onPress={() => router.push({ pathname: '/services/form', params: { id: String(current.id) } })}
+            />
+          )}
         </View>
       </Card>
 
@@ -105,12 +109,14 @@ export default function ServiceDetailScreen() {
             key={shift.id}
             shift={shift}
             show="guard"
-            onPress={() => router.push({ pathname: '/shifts/form', params: { id: String(shift.id) } })}
+            onPress={
+              isAdmin ? () => router.push({ pathname: '/shifts/form', params: { id: String(shift.id) } }) : undefined
+            }
           />
         ))
       )}
 
-      {current.active && (
+      {isAdmin && current.active && (
         <CustomButton
           title="Asignar turno"
           icon="add"
@@ -121,13 +127,15 @@ export default function ServiceDetailScreen() {
         />
       )}
 
-      <CustomButton
-        title={current.active ? 'Desactivar servicio' : 'Activar servicio'}
-        icon={current.active ? 'block' : 'check-circle'}
-        variant={current.active ? 'danger' : 'secondary'}
-        onPress={toggleActive}
-        style={styles.toggle}
-      />
+      {isAdmin && (
+        <CustomButton
+          title={current.active ? 'Desactivar servicio' : 'Activar servicio'}
+          icon={current.active ? 'block' : 'check-circle'}
+          variant={current.active ? 'danger' : 'secondary'}
+          onPress={toggleActive}
+          style={styles.toggle}
+        />
+      )}
     </ScreenContainer>
   );
 }
