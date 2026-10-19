@@ -1,42 +1,36 @@
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Tabs } from 'expo-router';
-import React from 'react';
+import type { ColorValue } from 'react-native';
+import type { ComponentProps } from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Palette } from '@/constants/theme';
+
+type IconName = ComponentProps<typeof MaterialIcons>['name'];
+
+function tabIcon(name: IconName) {
+  return function TabIcon({ color }: { color: ColorValue }) {
+    return <MaterialIcons size={26} name={name} color={color} />;
+  };
+}
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        tabBarActiveTintColor: Palette.primary,
+        tabBarInactiveTintColor: Palette.textMuted,
+        headerTitleStyle: { color: Palette.text },
         tabBarButton: HapticTab,
       }}>
+      <Tabs.Screen name="index" options={{ title: 'Inicio', tabBarIcon: tabIcon('home') }} />
       <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
+        name="who"
+        options={{ title: '¿Quién estuvo?', tabBarLabel: 'Consultar', tabBarIcon: tabIcon('person-search') }}
       />
-      <Tabs.Screen
-        name="services"
-        options={{
-          title: 'Services',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="briefcase.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="guards"
-        options={{
-          title: 'Guards',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="shield.fill" color={color} />,
-        }}
-      />
+      <Tabs.Screen name="shifts" options={{ title: 'Turnos', tabBarIcon: tabIcon('event') }} />
+      <Tabs.Screen name="guards" options={{ title: 'Guardias', tabBarIcon: tabIcon('badge') }} />
+      <Tabs.Screen name="services" options={{ title: 'Servicios', tabBarIcon: tabIcon('business') }} />
     </Tabs>
   );
 }

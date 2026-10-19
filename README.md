@@ -1,50 +1,79 @@
-# Welcome to your Expo app 👋
+# Security Shift Manager - Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App mobile (Expo + React Native) para gestionar los horarios de los guardias de seguridad y los servicios donde trabajan.
 
-## Get started
+Usa la API de [security-shift-manager-backend](https://github.com/HerreroT/security-shift-manager-backend).
 
-1. Install dependencies
+## Funcionalidades
+
+- **¿Quién estuvo?**: elegís un servicio, un día y una hora, y la app muestra qué guardia estaba de turno, con su DNI y teléfono.
+- **Inicio**: guardias en servicio en este momento y turnos del día.
+- **Turnos**: turnos por día, con filtros por servicio y guardia. Desde ahí se pueden crear, editar y eliminar turnos y registrar la entrada y la salida reales. Los turnos nocturnos (por ejemplo, de 20:00 a 08:00) terminan al día siguiente automáticamente.
+- **Guardias**: listado con búsqueda por nombre o DNI, alta y edición. El detalle muestra las **horas trabajadas en el mes** (del 1 al 31) con el detalle de cada turno.
+- **Servicios**: listado con búsqueda por nombre o ubicación, alta, edición y turnos de cada día.
+- **Reporte mensual**: horas de todos los guardias en un mes.
+
+## Cómo correrla
+
+El proyecto usa **Expo SDK 57**, así que necesitás la última versión de Expo Go. El archivo `.npmrc` activa `legacy-peer-deps` porque el selector de fecha declara como *peer* opcional a `react-native-windows`, que este proyecto no usa.
+
+1. Levantá el backend (ver su README). Queda escuchando en el puerto `8090`.
+2. Instalá las dependencias y arrancá Expo:
 
    ```bash
    npm install
-   ```
-
-2. Start the app
-
-   ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. Abrí la app:
+   - **Celular con Expo Go**: escaneá el código QR. El celular tiene que estar en la misma red WiFi que la PC.
+   - **Emulador Android**: tocá `a` en la terminal de Expo.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+4. Ingresá con el usuario de prueba `admin@shiftmanager.com` / `admin123`.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### ¿Cómo encuentra la app al backend?
 
-## Get a fresh project
+No hace falta configurar nada. La app usa la misma IP con la que Expo Go se conecta a la PC y apunta al puerto 8090, por ejemplo `http://192.168.0.10:8090/api`. En la pantalla de login, en modo desarrollo, se muestra la URL que está usando.
 
-When you're ready, run:
+Si necesitás otra URL, por ejemplo con `npx expo start --tunnel` o con el backend en otra máquina:
 
 ```bash
-npm run reset-project
+cp .env.example .env
+# editá EXPO_PUBLIC_API_URL y reiniciá Expo
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+| Dónde corre la app | URL |
+|---|---|
+| Celular con Expo Go | `http://<IP-de-la-PC>:8090/api` |
+| Emulador Android | `http://10.0.2.2:8090/api` |
+| Navegador / simulador iOS | `http://localhost:8090/api` |
 
-## Learn more
+Si el celular dice "No se pudo conectar con el servidor":
 
-To learn more about developing your project with Expo, look at the following resources:
+- Revisá que el backend esté corriendo.
+- Revisá que el celular y la PC estén en la misma red WiFi.
+- Revisá que el Firewall de Windows permita conexiones entrantes al puerto 8090 en redes privadas.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Estructura
 
-## Join the community
+```
+app/                  Pantallas (expo-router)
+  (auth)/login.tsx    Login
+  (tabs)/             Inicio, ¿Quién estuvo?, Turnos, Guardias, Servicios
+  guards/             Detalle y formulario de guardia
+  services/           Detalle y formulario de servicio
+  shifts/form.tsx     Alta / edición de turnos
+  reports/monthly.tsx Reporte mensual de horas
+components/           Componentes reutilizables (botones, campos, selectores, estados)
+hooks/                useFetch (carga de datos), useDebouncedValue
+lib/                  Cliente HTTP, sesión (expo-secure-store), fechas, configuración
+types/                Tipos de la API
+```
 
-Join our community of developers creating universal apps.
+## Scripts
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npx expo start      # servidor de desarrollo
+npm run lint        # ESLint
+npx tsc --noEmit    # chequeo de tipos
+```
