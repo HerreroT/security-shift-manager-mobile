@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [dev, main, deploy]
+  pull_request:
+    branches: [dev, main, deploy]
+
+jobs:
+  check:
+    name: Tipos, lint y bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Chequeo de tipos
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npm run lint
+      - name: Bundle de Android e iOS
+        run: npx expo export --platform android --platform ios --output-dir dist
