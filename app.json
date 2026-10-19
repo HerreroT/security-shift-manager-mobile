@@ -8,9 +8,11 @@
     "scheme": "securityshiftmanagermobile",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.herrerot.shiftmanager"
     },
     "android": {
+      "package": "com.herrerot.shiftmanager",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

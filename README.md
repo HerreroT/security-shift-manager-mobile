@@ -54,6 +54,22 @@ Si el celular dice "No se pudo conectar con el servidor":
 - Revisá que el celular y la PC estén en la misma red WiFi.
 - Revisá que el Firewall de Windows permita conexiones entrantes al puerto 8090 en redes privadas.
 
+## Deploy (builds con EAS)
+
+La rama `deploy` es la que se usa para generar las builds. Con [EAS Build](https://docs.expo.dev/build/introduction/):
+
+1. En `eas.json`, poné la URL pública del backend en `EXPO_PUBLIC_API_URL`.
+2. Generá la build:
+
+   ```bash
+   npm install -g eas-cli
+   eas login                                         # la misma cuenta de Expo
+   eas build --profile preview --platform android    # APK para instalar directo
+   eas build --profile production --platform ios     # para TestFlight / App Store
+   ```
+
+Para iOS hace falta una cuenta de Apple Developer.
+
 ## Estructura
 
 ```

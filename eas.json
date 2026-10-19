@@ -1,0 +1,26 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://CAMBIAR-POR-LA-URL-DEL-BACKEND:8090/api"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://CAMBIAR-POR-LA-URL-DEL-BACKEND/api"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
