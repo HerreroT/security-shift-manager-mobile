@@ -1,5 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Tabs } from 'expo-router';
+import type { ColorValue } from 'react-native';
 import type { ComponentProps } from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
@@ -8,7 +9,7 @@ import { Palette } from '@/constants/theme';
 type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
 function tabIcon(name: IconName) {
-  return function TabIcon({ color }: { color: string }) {
+  return function TabIcon({ color }: { color: ColorValue }) {
     return <MaterialIcons size={26} name={name} color={color} />;
   };
 }
