@@ -1,11 +1,15 @@
 // Types that mirror the backend DTOs. Dates come as local date-times without timezone,
 // e.g. "2026-10-12T20:00:00", and days as "2026-10-12".
 
+/** ADMIN can change data; SUPERVISOR can only consult. */
+export type Role = 'ADMIN' | 'SUPERVISOR';
+
 export type LoginResponse = {
   token: string;
   id: number;
   username: string;
   email: string;
+  role: Role;
 };
 
 export type Guard = {

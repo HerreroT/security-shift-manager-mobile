@@ -10,10 +10,12 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/ui/states';
 import { Palette, Spacing } from '@/constants/theme';
 import { useFetch } from '@/hooks/use-fetch';
 import { query } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import { toIsoDate } from '@/lib/dates';
 import type { Guard, Service, ShiftAssignment } from '@/types/api';
 
 export default function ShiftsScreen() {
+  const { isAdmin } = useAuth();
   const [day, setDay] = useState(() => new Date());
   const [serviceId, setServiceId] = useState<number | null>(null);
   const [guardId, setGuardId] = useState<number | null>(null);
@@ -76,23 +78,27 @@ export default function ShiftsScreen() {
           <ShiftCard
             shift={item}
             show="both"
-            onPress={() => router.push({ pathname: '/shifts/form', params: { id: String(item.id) } })}
+            onPress={
+              isAdmin ? () => router.push({ pathname: '/shifts/form', params: { id: String(item.id) } }) : undefined
+            }
           />
         )}
       />
-      <Fab
-        label="Turno"
-        onPress={() =>
-          router.push({
-            pathname: '/shifts/form',
-            params: {
-              date: isoDay,
-              ...(serviceId ? { serviceId: String(serviceId) } : {}),
-              ...(guardId ? { guardId: String(guardId) } : {}),
-            },
-          })
-        }
-      />
+      {isAdmin && (
+        <Fab
+          label="Turno"
+          onPress={() =>
+            router.push({
+              pathname: '/shifts/form',
+              params: {
+                date: isoDay,
+                ...(serviceId ? { serviceId: String(serviceId) } : {}),
+                ...(guardId ? { guardId: String(guardId) } : {}),
+              },
+            })
+          }
+        />
+      )}
     </View>
   );
 }

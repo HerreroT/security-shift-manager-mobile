@@ -16,7 +16,7 @@ import { formatHours, formatLongDate, parseDateTime, toIsoDate } from '@/lib/dat
 import type { ShiftAssignment } from '@/types/api';
 
 export default function HomeScreen() {
-  const { session, signOut } = useAuth();
+  const { session, isAdmin, signOut } = useAuth();
   const today = toIsoDate(new Date());
   const { data, error, isLoading, isRefreshing, refresh } = useFetch<ShiftAssignment[]>(
     `/shift-assignments${query({ from: today, to: today })}`,
@@ -35,11 +35,14 @@ export default function HomeScreen() {
       <View>
         <Text style={styles.greeting}>Hola, {session?.username ?? 'admin'}</Text>
         <Text style={styles.date}>Hoy es {formatLongDate(now)}</Text>
+        <Text style={styles.role}>{isAdmin ? 'Administrador' : 'Supervisor (solo consulta)'}</Text>
       </View>
 
       <View style={styles.actions}>
         <QuickAction icon="person-search" label="¿Quién estuvo?" onPress={() => router.push('/who')} />
-        <QuickAction icon="add-circle-outline" label="Nuevo turno" onPress={() => router.push('/shifts/form')} />
+        {isAdmin && (
+          <QuickAction icon="add-circle-outline" label="Nuevo turno" onPress={() => router.push('/shifts/form')} />
+        )}
         <QuickAction icon="bar-chart" label="Horas del mes" onPress={() => router.push('/reports/monthly')} />
       </View>
 
@@ -105,6 +108,12 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 15,
     color: Palette.textMuted,
+    marginTop: 2,
+  },
+  role: {
+    fontSize: 13,
+    color: Palette.primary,
+    fontWeight: '600',
     marginTop: 2,
   },
   actions: {

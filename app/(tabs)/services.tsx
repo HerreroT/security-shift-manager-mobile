@@ -11,9 +11,11 @@ import { Palette, Spacing } from '@/constants/theme';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useFetch } from '@/hooks/use-fetch';
 import { query } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import type { Service } from '@/types/api';
 
 export default function ServicesScreen() {
+  const { isAdmin } = useAuth();
   const [search, setSearch] = useState('');
   const [showInactive, setShowInactive] = useState(false);
   const debouncedSearch = useDebouncedValue(search.trim());
@@ -57,7 +59,7 @@ export default function ServicesScreen() {
           </Card>
         )}
       />
-      <Fab label="Servicio" onPress={() => router.push('/services/form')} />
+      {isAdmin && <Fab label="Servicio" onPress={() => router.push('/services/form')} />}
     </View>
   );
 }

@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { Platform } from 'react-native';
 
 import { api, setAuthToken, setUnauthorizedHandler } from '@/lib/api';
-import type { LoginResponse } from '@/types/api';
+import type { LoginResponse, Role } from '@/types/api';
 
 const SESSION_KEY = 'session';
 
@@ -11,11 +11,14 @@ export type Session = {
   token: string;
   username: string;
   email: string;
+  role: Role;
 };
 
 type AuthContextValue = {
   session: Session | null;
   isLoading: boolean;
+  /** Only admins can create, edit or delete. The backend enforces it too (403). */
+  isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -51,8 +54,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then((stored) => {
         if (stored) {
           const parsed = JSON.parse(stored) as Session;
-          setAuthToken(parsed.token);
-          setSession(parsed);
+          // Sessions saved before roles existed belonged to the admin.
+          const restored: Session = { ...parsed, role: parsed.role ?? 'ADMIN' };
+          setAuthToken(restored.token);
+          setSession(restored);
         }
       })
       .catch(() => undefined)
@@ -62,13 +67,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     const response = await api.post<LoginResponse>('/auth/login', { email, password });
-    const newSession: Session = { token: response.token, username: response.username, email: response.email };
+    const newSession: Session = {
+      token: response.token,
+      username: response.username,
+      email: response.email,
+      // Backends older than the roles feature do not send it, and there every user was an admin.
+      role: response.role ?? 'ADMIN',
+    };
     await storage.set(SESSION_KEY, JSON.stringify(newSession));
     setAuthToken(newSession.token);
     setSession(newSession);
   }, []);
 
-  const value = useMemo(() => ({ session, isLoading, signIn, signOut }), [session, isLoading, signIn, signOut]);
+  const isAdmin = session?.role === 'ADMIN';
+  const value = useMemo(
+    () => ({ session, isLoading, isAdmin, signIn, signOut }),
+    [session, isLoading, isAdmin, signIn, signOut],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
