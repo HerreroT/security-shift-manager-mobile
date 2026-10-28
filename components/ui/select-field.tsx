@@ -80,7 +80,7 @@ export function SelectField<T extends { id: number }>({
             ListHeaderComponent={
               clearLabel ? (
                 <Option label={clearLabel} selected={selectedId === null} onPress={() => choose(null)} />
-              ) : null
+              ) : undefined
             }
             ListEmptyComponent={<EmptyState message="No hay resultados" icon="search-off" />}
             renderItem={({ item }) => (

@@ -15,7 +15,7 @@ Usa la API de [security-shift-manager-backend](https://github.com/HerreroT/secur
 
 ## Cómo correrla
 
-El proyecto usa **Expo SDK 57**, así que necesitás la última versión de Expo Go. El archivo `.npmrc` activa `legacy-peer-deps` porque el selector de fecha declara como *peer* opcional a `react-native-windows`, que este proyecto no usa.
+El proyecto usa **Expo SDK 58**, así que necesitás la última versión de Expo Go. El archivo `.npmrc` activa `legacy-peer-deps` porque el selector de fecha declara como *peer* opcional a `react-native-windows`, que este proyecto no usa.
 
 1. Levantá el backend (ver su README). Queda escuchando en el puerto `8090`.
 2. Instalá las dependencias y arrancá Expo:
@@ -29,7 +29,7 @@ El proyecto usa **Expo SDK 57**, así que necesitás la última versión de Expo
    - **Celular con Expo Go**: escaneá el código QR. El celular tiene que estar en la misma red WiFi que la PC.
    - **Emulador Android**: tocá `a` en la terminal de Expo.
 
-4. Ingresá con el usuario de prueba `admin@shiftmanager.com` / `admin123`.
+4. Ingresá con el usuario de prueba `admin@shiftmanager.com` / `admin123`. Para probar el rol de solo lectura está `supervisor@shiftmanager.com` / `supervisor123`.
 
 ### ¿Cómo encuentra la app al backend?
 
