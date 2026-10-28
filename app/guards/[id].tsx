@@ -1,6 +1,6 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 
 import { ShiftCard } from '@/components/shift-card';
 import { ActiveBadge } from '@/components/ui/badge';
@@ -14,6 +14,7 @@ import { useFetch } from '@/hooks/use-fetch';
 import { api, errorMessage, query } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { endOfMonth, formatHours, formatMonth, startOfMonth, toIsoDate } from '@/lib/dates';
+import { confirmAction, showError } from '@/lib/dialogs';
 import type { Guard, GuardHoursReport } from '@/types/api';
 
 export default function GuardDetailScreen() {
@@ -44,31 +45,26 @@ export default function GuardDetailScreen() {
 
   const toggleActive = () => {
     const action = current.active ? 'Desactivar' : 'Activar';
-    Alert.alert(
-      `${action} guardia`,
-      current.active
+    confirmAction({
+      title: `${action} guardia`,
+      message: current.active
         ? `${fullName} no va a poder recibir turnos nuevos. Su historial se mantiene.`
         : `${fullName} va a poder recibir turnos nuevamente.`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: action,
-          style: current.active ? 'destructive' : 'default',
-          onPress: async () => {
-            try {
-              if (current.active) {
-                await api.delete(`/guards/${current.id}`);
-              } else {
-                await api.patch(`/guards/${current.id}/activate`);
-              }
-              guard.reload();
-            } catch (e) {
-              Alert.alert('Error', errorMessage(e));
-            }
-          },
-        },
-      ],
-    );
+      confirmLabel: action,
+      destructive: current.active,
+      onConfirm: async () => {
+        try {
+          if (current.active) {
+            await api.delete(`/guards/${current.id}`);
+          } else {
+            await api.patch(`/guards/${current.id}/activate`);
+          }
+          guard.reload();
+        } catch (e) {
+          showError(errorMessage(e));
+        }
+      },
+    });
   };
 
   return (

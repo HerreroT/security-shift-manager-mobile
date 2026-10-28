@@ -1,6 +1,6 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { ShiftCard } from '@/components/shift-card';
 import { ActiveBadge } from '@/components/ui/badge';
@@ -14,6 +14,7 @@ import { useFetch } from '@/hooks/use-fetch';
 import { api, errorMessage, query } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { toIsoDate } from '@/lib/dates';
+import { confirmAction, showError } from '@/lib/dialogs';
 import type { Service, ShiftAssignment } from '@/types/api';
 
 export default function ServiceDetailScreen() {
@@ -38,31 +39,26 @@ export default function ServiceDetailScreen() {
 
   const toggleActive = () => {
     const action = current.active ? 'Desactivar' : 'Activar';
-    Alert.alert(
-      `${action} servicio`,
-      current.active
+    confirmAction({
+      title: `${action} servicio`,
+      message: current.active
         ? `No se van a poder asignar turnos nuevos a ${current.name}. El historial se mantiene.`
         : `Se van a poder asignar turnos a ${current.name} nuevamente.`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: action,
-          style: current.active ? 'destructive' : 'default',
-          onPress: async () => {
-            try {
-              if (current.active) {
-                await api.delete(`/services/${current.id}`);
-              } else {
-                await api.patch(`/services/${current.id}/activate`);
-              }
-              service.reload();
-            } catch (e) {
-              Alert.alert('Error', errorMessage(e));
-            }
-          },
-        },
-      ],
-    );
+      confirmLabel: action,
+      destructive: current.active,
+      onConfirm: async () => {
+        try {
+          if (current.active) {
+            await api.delete(`/services/${current.id}`);
+          } else {
+            await api.patch(`/services/${current.id}/activate`);
+          }
+          service.reload();
+        } catch (e) {
+          showError(errorMessage(e));
+        }
+      },
+    });
   };
 
   return (

@@ -1,6 +1,6 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -22,6 +22,7 @@ import {
   parseDateTime,
   toIsoDateTime,
 } from '@/lib/dates';
+import { confirmAction, showError } from '@/lib/dialogs';
 import type { Guard, Service, ShiftAssignment, ShiftAssignmentRequest } from '@/types/api';
 
 type Params = {
@@ -159,21 +160,20 @@ function ShiftForm({ existing, guards, services, defaults, onChanged }: FormProp
 
   const remove = () => {
     if (!existing) return;
-    Alert.alert('Eliminar turno', '¿Seguro que querés eliminar este turno?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Eliminar',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await api.delete(`/shift-assignments/${existing.id}`);
-            router.back();
-          } catch (e) {
-            Alert.alert('Error', errorMessage(e));
-          }
-        },
+    confirmAction({
+      title: 'Eliminar turno',
+      message: '¿Seguro que querés eliminar este turno?',
+      confirmLabel: 'Eliminar',
+      destructive: true,
+      onConfirm: async () => {
+        try {
+          await api.delete(`/shift-assignments/${existing.id}`);
+          router.back();
+        } catch (e) {
+          showError(errorMessage(e));
+        }
       },
-    ]);
+    });
   };
 
   const registerAttendance = async (action: 'check-in' | 'check-out') => {
@@ -182,7 +182,7 @@ function ShiftForm({ existing, guards, services, defaults, onChanged }: FormProp
       await api.post(`/shift-assignments/${existing.id}/${action}`);
       onChanged();
     } catch (e) {
-      Alert.alert('Error', errorMessage(e));
+      showError(errorMessage(e));
     }
   };
 
