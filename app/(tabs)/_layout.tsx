@@ -10,7 +10,8 @@ type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
 function tabIcon(name: IconName) {
   return function TabIcon({ color }: { color: ColorValue }) {
-    return <MaterialIcons size={26} name={name} color={color} />;
+    // The tab bar passes the tint colors from screenOptions, which are always strings.
+    return <MaterialIcons size={26} name={name} color={color as string} />;
   };
 }
 
