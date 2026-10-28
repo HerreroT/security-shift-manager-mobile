@@ -72,6 +72,7 @@ export default function LoginScreen() {
         {__DEV__ && (
           <View style={styles.devHint}>
             <Text style={styles.devHintText}>Usuario de prueba: admin@shiftmanager.com / admin123</Text>
+            <Text style={styles.devHintText}>Supervisor: supervisor@shiftmanager.com / supervisor123</Text>
             <Text style={styles.devHintText}>Servidor: {API_URL}</Text>
           </View>
         )}
